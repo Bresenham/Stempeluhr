@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.standardbenutzer.stempeluhr.CircleProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="382dp"
+        android:layout_height="330dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="76dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.144"
+        app:progress="0"
+        app:progressBarThickness="36dp"
+        app:progressbarColor="@color/colorPrimary"
+        />
+
+    <at.markushi.ui.CircleButton
+        android:id="@+id/circleButton"
+        android:layout_width="258dp"
+        android:layout_height="158dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/button_check"
+        app:cb_color="#379bcd"
+        app:cb_pressedRingWidth="8dip"
+        app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintStart_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="@+id/progressBar" />
+
+    <Button
+        android:id="@+id/buttonCheck"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginEnd="44dp"
+        android:background="@mipmap/button_check"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/circleButton"
+        app:layout_constraintEnd_toEndOf="@+id/circleButton"
+        app:layout_constraintTop_toTopOf="@+id/circleButton"
+        app:layout_constraintVertical_bias="0.514" />
+
+    <Button
+        android:id="@+id/buttonCross"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginStart="44dp"
+        android:background="@mipmap/button_cross"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/circleButton"
+        app:layout_constraintStart_toStartOf="@+id/circleButton"
+        app:layout_constraintTop_toTopOf="@+id/circleButton"
+        app:layout_constraintVertical_bias="0.526" />
+
+    <com.ramotion.circlemenu.CircleMenuView
+        android:id="@+id/circleMenu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:layout_marginBottom="145dp"
+        app:button_colors="@array/colorArray"
+        app:button_icons="@array/buttonArray"
+        app:distance="60dp"
+        app:duration_open="0"
+        app:layout_constraintStart_toStartOf="@+id/circleButton"
+        app:layout_constraintEnd_toEndOf="@+id/circleButton"
+        app:layout_constraintTop_toTopOf="@+id/circleButton"
+        app:layout_constraintBottom_toBottomOf="@+id/circleButton"
+        />
+
+</android.support.constraint.ConstraintLayout>
