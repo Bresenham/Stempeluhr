@@ -32,37 +32,13 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:src="@mipmap/button_check"
+        android:src="@mipmap/button_start"
         app:cb_color="#379bcd"
         app:cb_pressedRingWidth="8dip"
         app:layout_constraintBottom_toBottomOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="@+id/progressBar"
         app:layout_constraintStart_toStartOf="@+id/progressBar"
         app:layout_constraintTop_toTopOf="@+id/progressBar" />
-
-    <Button
-        android:id="@+id/buttonCheck"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:layout_marginEnd="44dp"
-        android:background="@mipmap/button_check"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/circleButton"
-        app:layout_constraintEnd_toEndOf="@+id/circleButton"
-        app:layout_constraintTop_toTopOf="@+id/circleButton"
-        app:layout_constraintVertical_bias="0.514" />
-
-    <Button
-        android:id="@+id/buttonCross"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:layout_marginStart="44dp"
-        android:background="@mipmap/button_cross"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/circleButton"
-        app:layout_constraintStart_toStartOf="@+id/circleButton"
-        app:layout_constraintTop_toTopOf="@+id/circleButton"
-        app:layout_constraintVertical_bias="0.526" />
 
     <com.ramotion.circlemenu.CircleMenuView
         android:id="@+id/circleMenu"
@@ -79,5 +55,16 @@
         app:layout_constraintTop_toTopOf="@+id/circleButton"
         app:layout_constraintBottom_toBottomOf="@+id/circleButton"
         />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
 </android.support.constraint.ConstraintLayout>

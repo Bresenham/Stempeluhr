@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="colorArray">
-        <item>#379bcd</item>
+        <item>#39cc67</item>
         <item>#FF4081</item>
+        <item>#379bcd</item>
     </array>
 </resources>

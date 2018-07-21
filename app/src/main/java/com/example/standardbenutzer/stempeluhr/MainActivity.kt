@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import kotlinx.android.synthetic.main.view_pager.*
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +40,16 @@ class MainActivity : AppCompatActivity() {
         //startActivity(Intent(this, OverviewPagerActivity::class.java))
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when {
+            item!!.itemId == R.id.Settings -> {
+                Toast.makeText(this.applicationContext,"You clicked the settings button.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return true
+    }
+
     override fun onBackPressed() {
         if (mPager!!.currentItem == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
@@ -46,6 +59,11 @@ class MainActivity : AppCompatActivity() {
             // Otherwise, select the previous step.
             mPager!!.currentItem = mPager!!.currentItem - 1
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.custom_menu,menu)
+        return true
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {

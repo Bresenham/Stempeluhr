@@ -7,12 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import at.markushi.ui.CircleButton
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_start
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.ramotion.circlemenu.CircleMenuView
-import kotlinx.android.synthetic.main.input_view.*
+import java.util.concurrent.TimeUnit
 
 class InputViewFragment : Fragment() {
 
@@ -28,6 +29,10 @@ class InputViewFragment : Fragment() {
 
     private lateinit var progressBar : CircleProgressBar
 
+    private lateinit var textView  : TextView
+
+    private val timer = FunctionalTimer()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(
                 R.layout.input_view, container, false) as ViewGroup
@@ -35,10 +40,10 @@ class InputViewFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         val circleButton = view!!.findViewById(R.id.circleButton) as CircleButton
-        val buttonCross = view!!.findViewById(R.id.buttonCross) as Button
-        val buttonCheck = view!!.findViewById(R.id.buttonCheck) as Button
         val menu  = view!!.findViewById(R.id.circleMenu) as CircleMenuView
+
         progressBar = view!!.findViewById(R.id.progressBar) as CircleProgressBar
+        textView = view!!.findViewById(R.id.textView) as TextView
 
         menu.eventListener = object : CircleMenuView.EventListener() {
             override fun onMenuOpenAnimationStart(view: CircleMenuView) {
@@ -51,21 +56,36 @@ class InputViewFragment : Fragment() {
             }
 
             override fun onMenuCloseAnimationEnd(view: CircleMenuView) {
-                menu.visibility = View.INVISIBLE
+
             }
 
             override fun onButtonClickAnimationStart(view: CircleMenuView, index: Int) {
-                if(index == 0)
-                    Toast.makeText(activity!!.applicationContext,"Time saved.", Toast.LENGTH_SHORT).show()
-                else
-                    Toast.makeText(activity!!.applicationContext,"Time not saved.", Toast.LENGTH_SHORT).show()
+                when (index) {
+                    0 -> {
+                        Toast.makeText(activity!!.applicationContext, "Time saved.", Toast.LENGTH_SHORT).show()
+                        endCounting()
+                        currentState = State.RUNNING
+                        circleButton.visibility = View.VISIBLE
+                        circleButton.setImageResource(button_start)
+                    }
+                    1 -> {
+                        Toast.makeText(activity!!.applicationContext, "Time not saved.", Toast.LENGTH_SHORT).show()
+                        endCounting()
+                        currentState = State.RUNNING
+                        circleButton.visibility = View.VISIBLE
+                        circleButton.setImageResource(button_start)
+                    }
+                    else -> {
+                        timer.startTimer()
+                        currentState = State.STOPPED
+                        circleButton.visibility = View.VISIBLE
+                        circleButton.setImageResource(button_stop)
+                    }
+                }
             }
 
             override fun onButtonClickAnimationEnd(view: CircleMenuView, index: Int) {
                 menu.visibility = View.INVISIBLE
-                currentState = State.RUNNING
-                circleButton.visibility = View.VISIBLE
-                circleButton.setImageResource(button_start)
             }
         }
 
@@ -75,23 +95,10 @@ class InputViewFragment : Fragment() {
                 currentState = State.STOPPED
                 circleButton.setImageResource(button_stop)
             } else if (currentState == State.STOPPED){
-                endCounting()
+                timer.stopTimer()
                 currentState = State.CHECKED
                 circleButton.visibility = View.INVISIBLE
                 menu.visibility = View.VISIBLE
-            }
-        }
-
-        buttonCross.setOnClickListener {
-            if(currentState == State.CHECKED) {
-                setButtonsFinished()
-
-            }
-        }
-
-        buttonCheck.setOnClickListener{
-            if(currentState == State.CHECKED) {
-                setButtonsFinished()
             }
         }
 
@@ -100,7 +107,8 @@ class InputViewFragment : Fragment() {
 
     private fun startCounting() {
         progressBar.setProgress(0f)
-        startTime = System.currentTimeMillis()
+
+        timer.startTimer()
 
         handler = Handler()
         runnable = Runnable {
@@ -111,22 +119,21 @@ class InputViewFragment : Fragment() {
     }
 
     private fun updateProgressBar() {
-        val difference = System.currentTimeMillis() - startTime
+        val difference = timer.getRunningTime()
         val percentage = Math.min(100.0, difference.div(MAX_TIME.toDouble()) * 100).toFloat()
         progressBar.setProgress(percentage)
+        textView.text = String.format("%d min, %d sec",
+                TimeUnit.MILLISECONDS.toMinutes(difference),
+                TimeUnit.MILLISECONDS.toSeconds(difference) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(difference))
+        )
     }
 
     private fun endCounting() {
         handler = Handler()
         runnable = Runnable {  }
-    }
-
-    private fun setButtonsFinished() {
-        currentState = State.RUNNING
-        circleButton.visibility = View.VISIBLE
-        buttonCheck.visibility = View.INVISIBLE
-        buttonCross.visibility = View.INVISIBLE
-        circleButton.setImageResource(button_start)
+        textView.text = 0.toString()
+        timer.resetTimer()
     }
 
     enum class State {
