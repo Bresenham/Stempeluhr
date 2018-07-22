@@ -1,6 +1,7 @@
 package com.example.standardbenutzer.stempeluhr
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
@@ -13,6 +14,7 @@ import at.markushi.ui.CircleButton
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_start
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.ramotion.circlemenu.CircleMenuView
+import kotlinx.android.synthetic.main.input_view.*
 import java.util.concurrent.TimeUnit
 
 
@@ -131,14 +133,44 @@ class InputViewFragment() : Fragment() {
 
     private fun updateProgressBar() {
         val difference = timer.getRunningTime()
-        val percentage = Math.min(100.0, difference.div(MAX_TIME.toDouble()) * 100).toFloat()
+        val percentage = getTimePercentage(difference)
         progressBar.setProgress(percentage)
-        textView.text = String.format("%d min, %d sec",
-                TimeUnit.MILLISECONDS.toMinutes(difference),
-                TimeUnit.MILLISECONDS.toSeconds(difference) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(difference))
-        )
+        textView.text = msToString(difference)
+        if(percentage < 100) {
+            textViewDelay.setBackgroundColor(Color.RED)
+            textViewDelay.text = "-" + msToString(MAX_TIME - difference)
+        } else {
+            textViewDelay.setBackgroundColor(Color.GREEN)
+            textViewDelay.text = "+" + msToString(difference - MAX_TIME)
+        }
     }
+
+    private fun getTimePercentage(time : Long) : Float {
+        return time.div(MAX_TIME.toDouble()).toFloat() * 100.0f
+    }
+
+     private fun msToString(ms:Long):String {
+        val totalSecs = ms / 1000
+        val hours = totalSecs / 3600
+        val mins = totalSecs / 60 % 60
+        val secs = totalSecs % 60
+        val minsString = if (mins == 0L)
+        "00"
+        else
+            if (mins < 10)
+                "0$mins"
+            else
+            "" + mins
+        val secsString = if ((secs == 0L))
+        "00"
+        else
+        (if ((secs < 10))
+            "0$secs"
+        else
+        "" + secs)
+        return (hours).toString() + "h:" + minsString + "m:" + secsString + "s"
+    }
+
 
     private fun endCounting() {
         handler = Handler()
