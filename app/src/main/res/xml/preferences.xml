@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">>
+    <PreferenceCategory
+        android:title="Global settings"
+        android:key="1234">
+        <com.example.standardbenutzer.stempeluhr.TimePreference
+            android:key="worktime"
+            android:title="Worktime"
+        />
+        <com.example.standardbenutzer.stempeluhr.TimePreference
+            android:key="lunchbreak"
+            android:title="Lunchbreak"
+        />
+    </PreferenceCategory>
+</PreferenceScreen>

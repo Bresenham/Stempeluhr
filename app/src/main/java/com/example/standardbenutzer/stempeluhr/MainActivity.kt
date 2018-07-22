@@ -1,8 +1,10 @@
 package com.example.standardbenutzer.stempeluhr
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -28,26 +30,34 @@ class MainActivity : AppCompatActivity() {
      */
     private var mPagerAdapter: PagerAdapter? = null
 
+    private lateinit var inputFragment : InputViewFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.view_pager)
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = pager
-        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
         mPager!!.adapter = mPagerAdapter
 
-        //startActivity(Intent(this, OverviewPagerActivity::class.java))
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when {
             item!!.itemId == R.id.Settings -> {
-                Toast.makeText(this.applicationContext,"You clicked the settings button.", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, SettingsActivity::class.java))
             }
         }
 
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(::inputFragment.isInitialized)
+            inputFragment.setWorktime(PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
     }
 
     override fun onBackPressed() {
@@ -68,9 +78,16 @@ class MainActivity : AppCompatActivity() {
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
+        private lateinit var worktime : String
+
+        constructor(fm: FragmentManager, worktime: String) : this(fm) {
+            this.worktime = worktime
+        }
+
         override fun getItem(position: Int): Fragment {
             if (position == 0) {
-                return InputViewFragment()
+                inputFragment = InputViewFragment(worktime)
+                return inputFragment
             } else {
                 return OverviewFragment()
             }

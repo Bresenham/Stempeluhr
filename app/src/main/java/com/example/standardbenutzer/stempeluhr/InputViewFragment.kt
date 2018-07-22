@@ -1,12 +1,12 @@
 package com.example.standardbenutzer.stempeluhr
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import at.markushi.ui.CircleButton
@@ -15,17 +15,23 @@ import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.ramotion.circlemenu.CircleMenuView
 import java.util.concurrent.TimeUnit
 
-class InputViewFragment : Fragment() {
+
+class InputViewFragment() : Fragment() {
+
+    private lateinit var worktime : String
+
+    @SuppressLint("ValidFragment")
+    constructor(wrktime: String) : this() {
+        this.worktime = wrktime
+    }
 
     private var currentState = State.RUNNING
-
-    private var startTime = 0L
 
     private var handler = Handler()
 
     private var runnable = Runnable {  }
 
-    private val MAX_TIME = 7 * 60 * 60 * 1000
+    private var MAX_TIME = 0L
 
     private lateinit var progressBar : CircleProgressBar
 
@@ -34,11 +40,12 @@ class InputViewFragment : Fragment() {
     private val timer = FunctionalTimer()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(
-                R.layout.input_view, container, false) as ViewGroup
+        return inflater.inflate(R.layout.input_view, container, false) as ViewGroup
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        MAX_TIME = 60 * 1000L * (worktime.split(":")[0].toInt() * 60 + worktime.split(":")[1].toInt())
+
         val circleButton = view!!.findViewById(R.id.circleButton) as CircleButton
         val menu  = view!!.findViewById(R.id.circleMenu) as CircleMenuView
 
@@ -103,6 +110,10 @@ class InputViewFragment : Fragment() {
         }
 
         super.onActivityCreated(savedInstanceState)
+    }
+
+    fun setWorktime(worktime : String) {
+        this.MAX_TIME = 60 * 1000L * (worktime.split(":")[0].toInt() * 60 + worktime.split(":")[1].toInt())
     }
 
     private fun startCounting() {
