@@ -13,18 +13,24 @@ import android.widget.Toast
 import at.markushi.ui.CircleButton
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_start
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
+import com.example.standardbenutzer.stempeluhr.database.DBHandler
+import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
 import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
-import java.util.concurrent.TimeUnit
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class InputViewFragment() : Fragment() {
 
     private lateinit var worktime : String
+    private lateinit var database : DBHandler
 
     @SuppressLint("ValidFragment")
-    constructor(wrktime: String) : this() {
+    constructor(wrktime: String, database : DBHandler) : this() {
         this.worktime = wrktime
+        this.database = database
     }
 
     private var currentState = State.RUNNING
@@ -41,9 +47,8 @@ class InputViewFragment() : Fragment() {
 
     private val timer = FunctionalTimer()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.input_view, container, false) as ViewGroup
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.input_view, container, false) as ViewGroup
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         MAX_TIME = 60 * 1000L * (worktime.split(":")[0].toInt() * 60 + worktime.split(":")[1].toInt())
@@ -71,6 +76,7 @@ class InputViewFragment() : Fragment() {
             override fun onButtonClickAnimationStart(view: CircleMenuView, index: Int) {
                 when (index) {
                     0 -> {
+                        database.addEntry(DatabaseEntry(SimpleDateFormat("dd.MM.yy").format(Date()), timer.getRunningTime(), MAX_TIME))
                         Toast.makeText(activity!!.applicationContext, "Time saved.", Toast.LENGTH_SHORT).show()
                         endCounting()
                         currentState = State.RUNNING
@@ -145,31 +151,8 @@ class InputViewFragment() : Fragment() {
         }
     }
 
-    private fun getTimePercentage(time : Long) : Float {
-        return time.div(MAX_TIME.toDouble()).toFloat() * 100.0f
-    }
-
-     private fun msToString(ms:Long):String {
-        val totalSecs = ms / 1000
-        val hours = totalSecs / 3600
-        val mins = totalSecs / 60 % 60
-        val secs = totalSecs % 60
-        val minsString = if (mins == 0L)
-        "00"
-        else
-            if (mins < 10)
-                "0$mins"
-            else
-            "" + mins
-        val secsString = if ((secs == 0L))
-        "00"
-        else
-        (if ((secs < 10))
-            "0$secs"
-        else
-        "" + secs)
-        return (hours).toString() + "h:" + minsString + "m:" + secsString + "s"
-    }
+    private fun getTimePercentage(time : Long) : Float =
+            time.div(MAX_TIME.toDouble()).toFloat() * 100.0f
 
 
     private fun endCounting() {

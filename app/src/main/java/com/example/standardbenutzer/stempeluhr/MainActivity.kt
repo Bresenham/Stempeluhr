@@ -13,6 +13,8 @@ import android.support.v4.view.ViewPager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.standardbenutzer.stempeluhr.database.DBHandler
+import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import kotlinx.android.synthetic.main.view_pager.*
 
 class MainActivity : AppCompatActivity() {
@@ -32,16 +34,18 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var inputFragment : InputViewFragment
 
+    private lateinit var database : DBHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.view_pager)
+
+        this.database = DBHandler(this)
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = pager
         mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
         mPager!!.adapter = mPagerAdapter
-
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -86,10 +90,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             if (position == 0) {
-                inputFragment = InputViewFragment(worktime)
+                inputFragment = InputViewFragment(worktime, database)
                 return inputFragment
             } else {
-                return OverviewFragment()
+                return OverviewFragment(database)
             }
         }
 

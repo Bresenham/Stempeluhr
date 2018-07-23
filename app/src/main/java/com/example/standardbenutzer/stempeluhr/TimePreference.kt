@@ -62,7 +62,7 @@ class TimePreference(private val mContext: Context, attrs: AttributeSet) : Dialo
     }
 
     override fun onSetInitialValue(restoreValue: Boolean, defaultValue: Any?) {
-        var time: String? = null
+        val time: String?
 
         if (restoreValue) {
             if (defaultValue == null) {
