@@ -7,9 +7,5 @@
             android:key="worktime"
             android:title="Worktime"
         />
-        <com.example.standardbenutzer.stempeluhr.TimePreference
-            android:key="lunchbreak"
-            android:title="Lunchbreak"
-        />
     </PreferenceCategory>
 </PreferenceScreen>

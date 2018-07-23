@@ -16,6 +16,7 @@ import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.stringToMs
 import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
 import java.text.SimpleDateFormat
@@ -24,12 +25,13 @@ import java.util.*
 
 class InputViewFragment() : Fragment() {
 
-    private lateinit var worktime : String
+    private var MAX_TIME = 0L
+
     private lateinit var database : DBHandler
 
     @SuppressLint("ValidFragment")
-    constructor(wrktime: String, database : DBHandler) : this() {
-        this.worktime = wrktime
+    constructor(wrktime: Long, database : DBHandler) : this() {
+        this.MAX_TIME = wrktime
         this.database = database
     }
 
@@ -38,8 +40,6 @@ class InputViewFragment() : Fragment() {
     private var handler = Handler()
 
     private var runnable = Runnable {  }
-
-    private var MAX_TIME = 0L
 
     private lateinit var progressBar : CircleProgressBar
 
@@ -51,8 +51,6 @@ class InputViewFragment() : Fragment() {
             inflater.inflate(R.layout.input_view, container, false) as ViewGroup
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        MAX_TIME = 60 * 1000L * (worktime.split(":")[0].toInt() * 60 + worktime.split(":")[1].toInt())
-
         val circleButton = view!!.findViewById(R.id.circleButton) as CircleButton
         val menu  = view!!.findViewById(R.id.circleMenu) as CircleMenuView
 
@@ -121,7 +119,7 @@ class InputViewFragment() : Fragment() {
     }
 
     fun setWorktime(worktime : String) {
-        this.MAX_TIME = 60 * 1000L * (worktime.split(":")[0].toInt() * 60 + worktime.split(":")[1].toInt())
+        this.MAX_TIME = stringToMs(worktime)
     }
 
     private fun startCounting() {

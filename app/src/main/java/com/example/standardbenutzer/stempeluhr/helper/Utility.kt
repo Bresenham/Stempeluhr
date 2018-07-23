@@ -23,5 +23,15 @@ class Utility {
                     "" + secs)
             return (hours).toString() + "h:" + minsString + "m:" + secsString + "s"
         }
+
+        fun stringToMs(time : String) : Long {
+            return 60 * 1000L * (time.split(":")[0].toInt() * 60 + time.split(":")[1].toInt())
+        }
+
+        const val SIX_HOURS = 6 * 60 * 60 * 1000L
+        const val NINE_HOURS = 9 * 60 * 60 * 1000L
+
+        const val LUNCHBREAK_6H = 30 * 60 * 1000L
+        const val LUNCHBREAK_9H = 45 * 60 * 1000L
     }
 }

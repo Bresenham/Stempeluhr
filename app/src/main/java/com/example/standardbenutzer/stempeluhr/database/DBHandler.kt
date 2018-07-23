@@ -4,23 +4,25 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.LUNCHBREAK_6H
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.LUNCHBREAK_9H
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.NINE_HOURS
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.SIX_HOURS
 
-class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 3) {
+class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 6) {
 
     private val DATABASE_NAME = "STEMPELUHR_DB"
-    private val DATABASE_VERSION = 2
+    private val DATABASE_VERSION = 6
 
     private val ENTRY_TABLE_NAME = "STEMPEL_ZEITEN"
 
     private val PRIMARY_KEY = "ID"
     private val DAY = "DAY"
-    private val WORKLOAD = "WORKLOAD"
     private val WORKTIME = "WORKTIME"
-
-    private var latestID = 0
+    private val WORKLOAD = "WORKLOAD"
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val CREATE_TABLE = "CREATE TABLE $ENTRY_TABLE_NAME($PRIMARY_KEY UNSIGNED BIG INT PRIMARY KEY, $DAY TEXT, $WORKTIME UNSIGNED BIG INT, $WORKLOAD UNSIGNED BIG INT);"
+        val CREATE_TABLE = "CREATE TABLE $ENTRY_TABLE_NAME($PRIMARY_KEY INTEGER PRIMARY KEY AUTOINCREMENT, $DAY TEXT, $WORKTIME UNSIGNED BIG INT, $WORKLOAD UNSIGNED BIG INT);"
         db!!.execSQL(CREATE_TABLE)
     }
 
@@ -33,7 +35,6 @@ class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", nu
         val db = this.readableDatabase
 
         val values = ContentValues()
-        values.put(PRIMARY_KEY, latestID++)
         values.put(DAY, entry.getDate())
         values.put(WORKTIME, entry.getWorktime())
         values.put(WORKLOAD,entry.getWorkload())
@@ -44,7 +45,7 @@ class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", nu
 
     fun getAllEntries() : ArrayList<DatabaseEntry> {
         val entries = ArrayList<DatabaseEntry>()
-        val selectQuery = "SELECT * FROM $ENTRY_TABLE_NAME"
+        val selectQuery = "SELECT * FROM $ENTRY_TABLE_NAME ORDER BY $PRIMARY_KEY DESC"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery,null)
@@ -58,6 +59,29 @@ class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", nu
         cursor.close()
 
         return entries
+    }
+
+    fun getSumPlusMinus() : Long {
+        val selectQuery = "SELECT * FROM $ENTRY_TABLE_NAME ORDER BY $PRIMARY_KEY DESC"
+
+        val db = writableDatabase
+        val cursor = db.rawQuery(selectQuery,null)
+
+        var sum = 0L
+
+        if(cursor.moveToFirst()) {
+            do {
+                sum += cursor.getLong(2) - cursor.getLong(3)
+                if(cursor.getLong(2) >= SIX_HOURS)
+                    sum -= LUNCHBREAK_6H
+                else if(cursor.getLong(2) >= NINE_HOURS)
+                    sum -= LUNCHBREAK_9H
+            } while(cursor.moveToNext())
+        }
+
+        cursor.close()
+
+        return sum
     }
 
 }

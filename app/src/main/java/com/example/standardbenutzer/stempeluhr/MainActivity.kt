@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.stringToMs
 import kotlinx.android.synthetic.main.view_pager.*
 
 class MainActivity : AppCompatActivity() {
@@ -42,9 +43,11 @@ class MainActivity : AppCompatActivity() {
 
         this.database = DBHandler(this)
 
+        val worktime = stringToMs(PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
+
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = pager
-        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
+        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, worktime)
         mPager!!.adapter = mPagerAdapter
     }
 
@@ -60,8 +63,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(::inputFragment.isInitialized)
-            inputFragment.setWorktime(PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
+        if(::inputFragment.isInitialized) {
+            inputFragment.setWorktime(PreferenceManager.getDefaultSharedPreferences(this).getString("worktime", "07:00"))
+        }
     }
 
     override fun onBackPressed() {
@@ -82,9 +86,9 @@ class MainActivity : AppCompatActivity() {
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        private lateinit var worktime : String
+        private var worktime = 0L
 
-        constructor(fm: FragmentManager, worktime: String) : this(fm) {
+        constructor(fm: FragmentManager, worktime: Long) : this(fm) {
             this.worktime = worktime
         }
 
