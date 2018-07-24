@@ -28,6 +28,17 @@ class Utility {
             return 60 * 1000L * (time.split(":")[0].toInt() * 60 + time.split(":")[1].toInt())
         }
 
+        fun reduceTimeByLunchbreak(time : Long) : Long {
+            val reducedTime : Long
+            if(time in SIX_HOURS..(NINE_HOURS - 1))
+                reducedTime = time - LUNCHBREAK_6H
+            else if(time >= NINE_HOURS)
+                reducedTime = time - LUNCHBREAK_9H
+            else
+                reducedTime = time
+            return reducedTime
+        }
+
         const val SIX_HOURS = 6 * 60 * 60 * 1000L
         const val NINE_HOURS = 9 * 60 * 60 * 1000L
 

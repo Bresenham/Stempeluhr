@@ -1,4 +1,4 @@
-package com.example.standardbenutzer.stempeluhr
+package com.example.standardbenutzer.stempeluhr.helper
 
 class FunctionalTimer {
 

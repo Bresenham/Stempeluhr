@@ -15,7 +15,9 @@ import com.example.standardbenutzer.stempeluhr.R.mipmap.button_start
 import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
+import com.example.standardbenutzer.stempeluhr.helper.FunctionalTimer
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.reduceTimeByLunchbreak
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.stringToMs
 import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
@@ -136,16 +138,18 @@ class InputViewFragment() : Fragment() {
     }
 
     private fun updateProgressBar() {
-        val difference = timer.getRunningTime()
-        val percentage = getTimePercentage(difference)
+        var totalWorktime = timer.getRunningTime()
+
+        val percentage = getTimePercentage(reduceTimeByLunchbreak(totalWorktime))
         progressBar.setProgress(percentage)
-        textView.text = msToString(difference)
+        textView.text = msToString(totalWorktime)
+        totalWorktime = reduceTimeByLunchbreak(totalWorktime)
         if(percentage < 100) {
             textViewDelay.setBackgroundColor(Color.RED)
-            textViewDelay.text = "-" + msToString(MAX_TIME - difference)
+            textViewDelay.text = "-" + msToString(MAX_TIME - totalWorktime)
         } else {
             textViewDelay.setBackgroundColor(Color.GREEN)
-            textViewDelay.text = "+" + msToString(difference - MAX_TIME)
+            textViewDelay.text = "+" + msToString(totalWorktime - MAX_TIME)
         }
     }
 
