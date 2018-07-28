@@ -16,6 +16,7 @@ import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import com.example.standardbenutzer.stempeluhr.helper.FunctionalTimer
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatDateToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.reduceTimeByLunchbreak
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.stringToMs
@@ -76,7 +77,9 @@ class InputViewFragment() : Fragment() {
             override fun onButtonClickAnimationStart(view: CircleMenuView, index: Int) {
                 when (index) {
                     0 -> {
-                        database.addEntry(DatabaseEntry(SimpleDateFormat("dd.MM.yy").format(Date()), timer.getRunningTime(), MAX_TIME))
+                        val cal = Calendar.getInstance()
+                        cal.time = Date()
+                        database.addEntry(DatabaseEntry(0, cal, timer.getRunningTime(), MAX_TIME))
                         Toast.makeText(activity!!.applicationContext, "Time saved.", Toast.LENGTH_SHORT).show()
                         endCounting()
                         currentState = State.RUNNING

@@ -8,11 +8,13 @@ import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.LUNCHBRE
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.LUNCHBREAK_9H
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.NINE_HOURS
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.SIX_HOURS
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatDateToString
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatStringToDate
 
-class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 6) {
+class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 7) {
 
     private val DATABASE_NAME = "STEMPELUHR_DB"
-    private val DATABASE_VERSION = 6
+    private val DATABASE_VERSION = 7
 
     private val ENTRY_TABLE_NAME = "STEMPEL_ZEITEN"
 
@@ -35,11 +37,23 @@ class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", nu
         val db = this.readableDatabase
 
         val values = ContentValues()
-        values.put(DAY, entry.getDate())
+        values.put(DAY, formatDateToString(entry.getDate()))
         values.put(WORKTIME, entry.getWorktime())
         values.put(WORKLOAD,entry.getWorkload())
 
         db.insert(ENTRY_TABLE_NAME, null, values)
+        db.close()
+    }
+
+    fun editEntry(entry : DatabaseEntry) {
+        val db = this.readableDatabase
+
+        val values = ContentValues()
+        values.put(DAY, formatDateToString(entry.getDate()))
+        values.put(WORKTIME, entry.getWorktime())
+        values.put(WORKLOAD, entry.getWorkload())
+
+        db.update(ENTRY_TABLE_NAME, values, "$PRIMARY_KEY=${entry.getID()}", null)
         db.close()
     }
 
@@ -52,7 +66,7 @@ class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", nu
 
         if(cursor.moveToFirst()) {
             do {
-                entries.add(DatabaseEntry(cursor.getString(1), cursor.getLong(2), cursor.getLong(3)))
+                entries.add(DatabaseEntry(cursor.getInt(0), formatStringToDate(cursor.getString(1)), cursor.getLong(2), cursor.getLong(3)))
             } while(cursor.moveToNext())
         }
 

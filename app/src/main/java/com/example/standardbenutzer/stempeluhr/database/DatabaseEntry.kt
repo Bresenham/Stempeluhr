@@ -1,8 +1,21 @@
 package com.example.standardbenutzer.stempeluhr.database
 
-class DatabaseEntry(private val date: String, private val worktime: Long, private val workload : Long) {
+import java.io.Serializable
+import java.util.*
 
-    fun getDate() : String {
+class DatabaseEntry(private val id : Int, private var date: Calendar, private var worktime: Long, private val workload : Long) : Serializable{
+
+    private lateinit var plusMinus : String
+
+    constructor( id : Int, date: Calendar, worktime: Long, workload : Long, plusMinus : String) : this(id,date,worktime, workload) {
+        this.plusMinus = plusMinus
+    }
+
+    fun getID() : Int {
+        return id
+    }
+
+    fun getDate() : Calendar {
         return date
     }
 
@@ -12,5 +25,21 @@ class DatabaseEntry(private val date: String, private val worktime: Long, privat
 
     fun getWorkload() : Long {
         return workload
+    }
+
+    fun getPlusMinus() : String {
+        return plusMinus
+    }
+
+    fun setPlusMinus(str : String) {
+        this.plusMinus = str
+    }
+
+    fun setDate(date : Calendar) {
+        this.date = date
+    }
+
+    fun setWorktime(worktime : Long) {
+        this.worktime = worktime
     }
 }

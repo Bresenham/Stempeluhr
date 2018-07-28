@@ -13,6 +13,9 @@ import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.reduceTimeByLunchbreak
+import android.content.Intent
+import com.example.standardbenutzer.stempeluhr.edit.EditListViewActivity
+
 
 class OverviewFragment : Fragment {
 
@@ -37,14 +40,20 @@ class OverviewFragment : Fragment {
             swiperefresh.isRefreshing = false
         }
 
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val clickedItem = parent.getItemAtPosition(position) as DatabaseEntry
+            val intent = Intent(activity, EditListViewActivity::class.java)
+            intent.putExtra("entry", clickedItem)
+            startActivity(intent)
+        }
+
         super.onActivityCreated(savedInstanceState)
     }
 
-    private fun updateListView(databaseEntries : ArrayList<DatabaseEntry>, sPlusMinus : Long) : ArrayList<ListViewEntry> {
-        val listEntries = ArrayList<ListViewEntry>()
+    private fun updateListView(databaseEntries : ArrayList<DatabaseEntry>, sPlusMinus : Long) : ArrayList<DatabaseEntry> {
+        val listEntries = ArrayList<DatabaseEntry>()
 
         databaseEntries.forEach {
-            val timeString = msToString(it.getWorktime())
             var plusMinus : String
             var difference = reduceTimeByLunchbreak(it.getWorktime()) - it.getWorkload()
             if(difference < 0) {
@@ -53,7 +62,7 @@ class OverviewFragment : Fragment {
             } else
                 plusMinus = "+"
             plusMinus += msToString(difference)
-            listEntries.add(ListViewEntry(it.getDate(),timeString,plusMinus))
+            listEntries.add(DatabaseEntry(it.getID(), it.getDate(), it.getWorktime(), it.getWorkload(), plusMinus))
         }
 
         var sumPlusMinus = sPlusMinus
