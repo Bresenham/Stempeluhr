@@ -31,10 +31,6 @@ class DatabaseEntry(private val id : Int, private var date: Calendar, private va
         return plusMinus
     }
 
-    fun setPlusMinus(str : String) {
-        this.plusMinus = str
-    }
-
     fun setDate(date : Calendar) {
         this.date = date
     }

@@ -37,7 +37,7 @@ class EditListViewActivity : AppCompatActivity(){
             view, hourOfDay, minute ->
             entry.setWorktime(60 * 1000L * (hourOfDay * 60 + minute))
             txtEntryWorktime.setText(msToString(entry.getWorktime()))
-        }, getHoursFromMs(entry.getWorktime()),getMinutesFromMs(entry.getWorktime()),true)
+        }, getHoursFromMs(entry.getWorktime()), getMinutesFromMs(entry.getWorktime()),true)
 
         txtEntryDate.setText(formatDateToString(entry.getDate()))
 

@@ -1,10 +1,16 @@
 package com.example.standardbenutzer.stempeluhr
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.PendingIntent
+import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +30,12 @@ import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
 import java.text.SimpleDateFormat
 import java.util.*
+import android.widget.RemoteViews
+import kotlinx.android.synthetic.main.notification_layout.*
+import android.content.Context.NOTIFICATION_SERVICE
+import android.app.NotificationManager
+import android.content.Context
+import android.support.v4.app.NotificationBuilderWithBuilderAccessor
 
 
 class InputViewFragment() : Fragment() {
@@ -49,6 +61,12 @@ class InputViewFragment() : Fragment() {
     private lateinit var textView  : TextView
 
     private val timer = FunctionalTimer()
+
+    private lateinit var mRemoteViews : RemoteViews
+
+    private lateinit var mNotificationManager: NotificationManagerCompat
+
+    private lateinit var mBuilder : NotificationCompat.Builder
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.input_view, container, false) as ViewGroup
@@ -109,6 +127,7 @@ class InputViewFragment() : Fragment() {
 
         circleButton.setOnClickListener {
             if(currentState == State.RUNNING) {
+                createRemoteView()
                 startCounting()
                 currentState = State.STOPPED
                 circleButton.setImageResource(button_stop)
@@ -154,6 +173,29 @@ class InputViewFragment() : Fragment() {
             textViewDelay.setBackgroundColor(Color.GREEN)
             textViewDelay.text = "+" + msToString(totalWorktime - MAX_TIME)
         }
+
+        mRemoteViews.setTextViewText(R.id.txtCurrentWorktime, msToString(totalWorktime))
+        mNotificationManager.notify(0, mBuilder.build())
+    }
+
+    private fun createRemoteView() {
+        mNotificationManager = NotificationManagerCompat.from(activity!!.applicationContext)
+
+        val intent = Intent(activity!!.applicationContext, MainActivity::class.java)
+        intent.action = Intent.ACTION_MAIN
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+
+        val pendingIntent = PendingIntent.getActivity(activity!!.applicationContext, 0,
+                intent, 0)
+
+        mRemoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.notification_layout)
+        mRemoteViews.setImageViewResource(R.id.imageView, R.mipmap.time_left_blue)
+        mRemoteViews.setTextViewText(R.id.txtCurrentWorktime, "This text is created programmatically.")
+
+        mBuilder = NotificationCompat.Builder(activity!!.applicationContext,"1")
+        mBuilder.setSmallIcon(R.mipmap.time_left).setAutoCancel(false).setOngoing(true).setContentIntent(pendingIntent).setContent(mRemoteViews)
+
+        mNotificationManager.notify(0, mBuilder.build())
     }
 
     private fun getTimePercentage(time : Long) : Float =

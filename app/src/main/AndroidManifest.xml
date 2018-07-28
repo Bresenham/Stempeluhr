@@ -16,9 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OverviewPagerActivity">
-
-        </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".edit.EditListViewActivity" />
     </application>
