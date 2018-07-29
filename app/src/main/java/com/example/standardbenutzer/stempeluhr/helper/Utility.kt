@@ -63,6 +63,15 @@ class Utility {
             return reducedTime
         }
 
+        fun getPlusMinusWorktime(totalWorktime : Long, workload : Long) : String {
+            val worktimeWithLunch = reduceTimeByLunchbreak(totalWorktime)
+            val completeWorktime = worktimeWithLunch - workload
+            if(completeWorktime > 0)
+                return "+" + msToString(completeWorktime)
+            else
+                return "-" + msToString(completeWorktime * - 1)
+        }
+
         const val SIX_HOURS = 6 * 60 * 60 * 1000L
         const val NINE_HOURS = 9 * 60 * 60 * 1000L
 

@@ -27,6 +27,7 @@ import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
 import java.util.*
 import android.widget.RemoteViews
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.getPlusMinusWorktime
 
 
 class InputViewFragment() : Fragment() {
@@ -159,7 +160,7 @@ class InputViewFragment() : Fragment() {
         val worktimeWithLunch = reduceTimeByLunchbreak(totalWorktime)
 
         val percentage = getTimePercentage(worktimeWithLunch)
-        val plusMinusTime : String
+        val plusMinusTime = getPlusMinusWorktime(totalWorktime, MAX_TIME)
 
         progressBar.setProgress(percentage)
         textView.text = msToString(totalWorktime)
@@ -167,11 +168,9 @@ class InputViewFragment() : Fragment() {
         if(percentage < 100) {
             textViewDelay.setBackgroundColor(Color.RED)
             mRemoteViews.setTextColor(R.id.txtPlusMinus, Color.rgb(172,220,244))
-            plusMinusTime = "-" + msToString(MAX_TIME - worktimeWithLunch)
         } else {
             textViewDelay.setBackgroundColor(Color.GREEN)
             mRemoteViews.setTextColor(R.id.txtPlusMinus, Color.rgb(53,154,204))
-            plusMinusTime = "+" + msToString(worktimeWithLunch - MAX_TIME)
         }
 
         textViewDelay.text = plusMinusTime

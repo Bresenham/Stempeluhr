@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.overview.*
 import ListViewAdapter
+import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Color
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
@@ -14,7 +15,18 @@ import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.reduceTimeByLunchbreak
 import android.content.Intent
+import android.os.Environment
+import android.widget.Toast
 import com.example.standardbenutzer.stempeluhr.edit.EditListViewActivity
+import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatDateToString
+import com.opencsv.CSVWriter
+import java.io.File
+import java.io.FileWriter
+import android.support.v4.app.ActivityCompat
+import android.content.pm.PackageManager
+import android.support.v4.content.ContextCompat
+
+
 
 
 class OverviewFragment : Fragment {
@@ -47,6 +59,10 @@ class OverviewFragment : Fragment {
             val intent = Intent(activity, EditListViewActivity::class.java)
             intent.putExtra("entry", clickedItem)
             startActivity(intent)
+        }
+
+        btnExportCSV.setOnClickListener {
+            exportDataToCSV()
         }
 
         super.onActivityCreated(savedInstanceState)
@@ -83,6 +99,49 @@ class OverviewFragment : Fragment {
         txtSumPlusMinus.text = sumPlusMinusStr
 
         return listEntries
+    }
+
+    private fun exportDataToCSV() {
+        if(!::database.isInitialized)
+            Toast.makeText(activity!!.applicationContext, "Database Connection is not initialized!", Toast.LENGTH_LONG).show()
+        if(Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED)
+            Toast.makeText(activity!!.applicationContext, "External Storage not mounted!", Toast.LENGTH_LONG).show()
+
+        val writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity!!.applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+        }
+
+        val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+        val fileName = "Stempeluhr_Dateiexport.csv"
+        val filePath = baseDir + File.separator + fileName
+        val f = File(filePath)
+        val writer : CSVWriter
+        if(f.exists())
+            writer = CSVWriter(FileWriter(filePath, false))
+        else {
+            f.createNewFile()
+            writer = CSVWriter(FileWriter(filePath))
+        }
+
+        writer.writeNext(arrayOf("Date", "Worktime", "PlusMinus"))
+
+        val entries = database.getAllEntries()
+
+        entries.forEach {
+            writer.writeNext(arrayOf(formatDateToString(it.getDate()), msToString(it.getWorktime()), it.getPlusMinus()))
+        }
+
+        val plusMinusSum = database.getSumPlusMinus()
+        if(plusMinusSum < 0)
+            writer.writeNext(arrayOf("Total PlusMinus:","", "-" + msToString(plusMinusSum * -1)))
+        else
+            writer.writeNext(arrayOf("Total PlusMinus:","", "+" + msToString(plusMinusSum)))
+
+        writer.close()
+
+        Toast.makeText(activity!!.applicationContext, "Successfully exported data.", Toast.LENGTH_LONG).show()
+
     }
 
 }
