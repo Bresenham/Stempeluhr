@@ -34,6 +34,8 @@ class OverviewFragment : Fragment {
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        if(!::database.isInitialized)
+            return
         listView.adapter = ListViewAdapter(this.requireActivity().applicationContext, updateListView(database.getAllEntries(), database.getSumPlusMinus()))
         swiperefresh.setOnRefreshListener {
             listView.adapter = ListViewAdapter(this.requireActivity().applicationContext, updateListView(database.getAllEntries(), database.getSumPlusMinus()))

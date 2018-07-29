@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.DatePicker
 import com.example.standardbenutzer.stempeluhr.R
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry

@@ -1,10 +1,8 @@
 package com.example.standardbenutzer.stempeluhr
 
 import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -22,20 +20,13 @@ import com.example.standardbenutzer.stempeluhr.R.mipmap.button_stop
 import com.example.standardbenutzer.stempeluhr.database.DBHandler
 import com.example.standardbenutzer.stempeluhr.database.DatabaseEntry
 import com.example.standardbenutzer.stempeluhr.helper.FunctionalTimer
-import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatDateToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.msToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.reduceTimeByLunchbreak
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.stringToMs
 import com.ramotion.circlemenu.CircleMenuView
 import kotlinx.android.synthetic.main.input_view.*
-import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.RemoteViews
-import kotlinx.android.synthetic.main.notification_layout.*
-import android.content.Context.NOTIFICATION_SERVICE
-import android.app.NotificationManager
-import android.content.Context
-import android.support.v4.app.NotificationBuilderWithBuilderAccessor
 
 
 class InputViewFragment() : Fragment() {
@@ -97,6 +88,8 @@ class InputViewFragment() : Fragment() {
                     0 -> {
                         val cal = Calendar.getInstance()
                         cal.time = Date()
+                        while(!::database.isInitialized)
+                            ;
                         database.addEntry(DatabaseEntry(0, cal, timer.getRunningTime(), MAX_TIME))
                         Toast.makeText(activity!!.applicationContext, "Time saved.", Toast.LENGTH_SHORT).show()
                         endCounting()
@@ -160,21 +153,31 @@ class InputViewFragment() : Fragment() {
     }
 
     private fun updateProgressBar() {
-        var totalWorktime = timer.getRunningTime()
+        if(!::progressBar.isInitialized or !::textView.isInitialized or !::mRemoteViews.isInitialized or !::mNotificationManager.isInitialized or !::mBuilder.isInitialized)
+            return
+        val totalWorktime = timer.getRunningTime()
+        val worktimeWithLunch = reduceTimeByLunchbreak(totalWorktime)
 
-        val percentage = getTimePercentage(reduceTimeByLunchbreak(totalWorktime))
+        val percentage = getTimePercentage(worktimeWithLunch)
+        val plusMinusTime : String
+
         progressBar.setProgress(percentage)
         textView.text = msToString(totalWorktime)
-        totalWorktime = reduceTimeByLunchbreak(totalWorktime)
+
         if(percentage < 100) {
             textViewDelay.setBackgroundColor(Color.RED)
-            textViewDelay.text = "-" + msToString(MAX_TIME - totalWorktime)
+            mRemoteViews.setTextColor(R.id.txtPlusMinus, Color.rgb(172,220,244))
+            plusMinusTime = "-" + msToString(MAX_TIME - worktimeWithLunch)
         } else {
             textViewDelay.setBackgroundColor(Color.GREEN)
-            textViewDelay.text = "+" + msToString(totalWorktime - MAX_TIME)
+            mRemoteViews.setTextColor(R.id.txtPlusMinus, Color.rgb(53,154,204))
+            plusMinusTime = "+" + msToString(worktimeWithLunch - MAX_TIME)
         }
 
+        textViewDelay.text = plusMinusTime
+
         mRemoteViews.setTextViewText(R.id.txtCurrentWorktime, msToString(totalWorktime))
+        mRemoteViews.setTextViewText(R.id.txtPlusMinus, plusMinusTime)
         mNotificationManager.notify(0, mBuilder.build())
     }
 
@@ -190,7 +193,6 @@ class InputViewFragment() : Fragment() {
 
         mRemoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.notification_layout)
         mRemoteViews.setImageViewResource(R.id.imageView, R.mipmap.time_left_blue)
-        mRemoteViews.setTextViewText(R.id.txtCurrentWorktime, "This text is created programmatically.")
 
         mBuilder = NotificationCompat.Builder(activity!!.applicationContext,"1")
         mBuilder.setSmallIcon(R.mipmap.time_left).setAutoCancel(false).setOngoing(true).setContentIntent(pendingIntent).setContent(mRemoteViews)

@@ -35,19 +35,15 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var inputFragment : InputViewFragment
 
-    private lateinit var database : DBHandler
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.view_pager)
-
-        this.database = DBHandler(this)
 
         val worktime = stringToMs(PreferenceManager.getDefaultSharedPreferences(this).getString("worktime","07:00"))
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = pager
-        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, worktime)
+        mPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, worktime, DBHandler(this))
         mPager!!.adapter = mPagerAdapter
     }
 
@@ -84,17 +80,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
-
-        private var worktime = 0L
-
-        constructor(fm: FragmentManager, worktime: Long) : this(fm) {
-            this.worktime = worktime
-        }
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val worktime: Long, private val database: DBHandler) : FragmentStatePagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
             if (position == 0) {
-                inputFragment = InputViewFragment(worktime, database)
+                inputFragment = InputViewFragment(worktime,database)
                 return inputFragment
             } else {
                 return OverviewFragment(database)
