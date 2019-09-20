@@ -11,10 +11,10 @@ import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.SIX_HOUR
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatDateToString
 import com.example.standardbenutzer.stempeluhr.helper.Utility.Companion.formatStringToDate
 
-class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 7) {
+class DBHandler(context: Context) : SQLiteOpenHelper(context, "StempeluhrDB", null, 8) {
 
     private val DATABASE_NAME = "STEMPELUHR_DB"
-    private val DATABASE_VERSION = 7
+    private val DATABASE_VERSION = 8
 
     private val ENTRY_TABLE_NAME = "STEMPEL_ZEITEN"
 
